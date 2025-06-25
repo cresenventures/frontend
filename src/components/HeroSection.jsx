@@ -38,10 +38,10 @@ const HeroSection = React.forwardRef(({ handleWhatsAppContact }, ref) => {
         else if (ref) ref.current = el;
       }}
       aria-labelledby="hero-heading"
-      className="relative flex items-center justify-center overflow-hidden min-h-screen w-full pt-8 pb-8 sm:pt-0 sm:pb-0"
+      className="relative flex items-center justify-center overflow-x-hidden overflow-hidden min-h-screen w-full pt-8 pb-8 sm:pt-0 sm:pb-0 max-w-full"
     >
       {/* Video background - absolute, only visible in this section */}
-      <div className="absolute inset-0 w-full h-full z-0 pointer-events-none overflow-hidden">
+      <div className="absolute inset-0 w-full h-full z-0 pointer-events-none overflow-hidden max-w-full">
         <video
           id="hero-bg-video"
           autoPlay
@@ -56,7 +56,7 @@ const HeroSection = React.forwardRef(({ handleWhatsAppContact }, ref) => {
           Your browser does not support the video tag.
         </video>
       </div>
-      <div className="container mx-auto px-4 text-center relative z-20 max-w-3xl flex flex-col justify-center items-center">
+      <div className="container mx-auto px-4 text-center relative z-20 max-w-3xl flex flex-col justify-center items-center w-full overflow-x-hidden max-w-full">
         <h1
           id="hero-heading"
           ref={titleRef}
