@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 220 20% 98%; /* Softer Off-white */
+    --foreground: 220 10% 10%; /* Darker, richer black */
+    --card: 0 0% 100%;
+    --card-foreground: 220 10% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 10% 10%;
+    --primary: 210 90% 55%; /* More vibrant, electric blue */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 15% 95.9%;
+    --secondary-foreground: 220 8% 10%;
+    --muted: 220 15% 95.9%;
+    --muted-foreground: 220 8% 45%;
+    --accent: 220 15% 92.9%;
+    --accent-foreground: 220 8% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 220 15% 88%;
+    --input: 220 15% 88%;
+    --ring: 210 90% 55%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 220 10% 10%;
+    --foreground: 0 0% 98%;
+    --card: 220 10% 10%;
+    --card-foreground: 0 0% 98%;
+    --popover: 220 10% 10%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 210 90% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 8% 15%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 220 8% 15%;
+    --muted-foreground: 220 5% 65%;
+    --accent: 220 8% 15%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 220 8% 20%;
+    --input: 220 8% 20%;
+    --ring: 210 90% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap');
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--secondary));
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--primary) / 0.6);
+  border-radius: 10px;
+  border: 2px solid hsl(var(--secondary));
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: hsl(var(--primary));
+}
+
+.pattern-bg {
+  background-image: radial-gradient(hsl(var(--primary) / 0.1) 1px, transparent 1px);
+  background-size: 25px 25px;
+  opacity: 0.8;
+}
