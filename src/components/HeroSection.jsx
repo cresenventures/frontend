@@ -60,10 +60,10 @@ const HeroSection = React.forwardRef(({ handleWhatsAppContact }, ref) => {
         <h1
           id="hero-heading"
           ref={titleRef}
-          className="text-3xl xs:text-4xl md:text-7xl font-extrabold text-white mb-6 leading-tight drop-shadow-xl"
+          className="text-5xl xs:text-6xl md:text-7xl font-extrabold text-white mb-6 leading-tight drop-shadow-xl"
         >
           Premium Thermal Paper Solutions
-          <span className="block w-full text-lg xs:text-2xl md:text-4xl font-bold mt-2">
+          <span className="block w-full text-3xl xs:text-4xl md:text-4xl font-bold mt-2">
             for Every Industry
           </span>
           <hr className="my-6 border-t-2 border-primary w-24 mx-auto opacity-80" />
