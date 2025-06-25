@@ -38,7 +38,7 @@ const HeroSection = React.forwardRef(({ handleWhatsAppContact }, ref) => {
         else if (ref) ref.current = el;
       }}
       aria-labelledby="hero-heading"
-      className="relative flex items-center justify-center overflow-hidden min-h-screen w-full pt-0 pb-0"
+      className="relative flex items-center justify-center overflow-hidden min-h-screen w-full pt-8 pb-8 sm:pt-0 sm:pb-0"
     >
       {/* Video background - absolute, only visible in this section */}
       <div className="absolute inset-0 w-full h-full z-0 pointer-events-none overflow-hidden">
@@ -60,27 +60,27 @@ const HeroSection = React.forwardRef(({ handleWhatsAppContact }, ref) => {
         <h1
           id="hero-heading"
           ref={titleRef}
-          className="text-4xl md:text-7xl font-extrabold text-white mb-6 leading-tight drop-shadow-xl"
+          className="text-3xl xs:text-4xl md:text-7xl font-extrabold text-white mb-6 leading-tight drop-shadow-xl"
         >
           Premium Thermal Paper Solutions
-          <span className="block w-full text-2xl md:text-4xl font-bold mt-2">
+          <span className="block w-full text-lg xs:text-2xl md:text-4xl font-bold mt-2">
             for Every Industry
           </span>
           <hr className="my-6 border-t-2 border-primary w-24 mx-auto opacity-80" />
         </h1>
         <p
           ref={subtitleRef}
-          className="text-lg md:text-2xl text-white font-medium mb-10 max-w-2xl mx-auto drop-shadow"
+          className="text-base xs:text-lg md:text-2xl text-white font-medium mb-10 max-w-2xl mx-auto drop-shadow"
         >
           Globally recognized manufacturer delivering clear, durable, reliable thermal paper products for diverse industries.
         </p>
         <div
           ref={buttonsRef}
-          className="flex flex-col sm:flex-row gap-5 justify-center items-center"
+          className="flex flex-col gap-4 sm:flex-row sm:gap-5 justify-center items-center w-full"
         >
           <Button
             onClick={() => document.getElementById('products').scrollIntoView({ behavior: 'smooth' })}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 text-base rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 text-base rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg w-full sm:w-auto min-h-[48px] min-w-[48px]"
           >
             <Sparkles className="w-5 h-5 mr-2" />
             Explore Products
@@ -88,7 +88,7 @@ const HeroSection = React.forwardRef(({ handleWhatsAppContact }, ref) => {
           <Button
             onClick={handleWhatsAppContact}
             variant="outline"
-            className="border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground px-6 py-3 text-base rounded-full transition-all duration-300 transform hover:scale-105"
+            className="border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground px-8 py-4 text-base rounded-full transition-all duration-300 transform hover:scale-105 w-full sm:w-auto min-h-[48px] min-w-[48px]"
           >
             <MessageCircle className="w-5 h-5 mr-2" />
             Get Quote
