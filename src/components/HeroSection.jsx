@@ -52,7 +52,7 @@ const HeroSection = React.forwardRef(({ handleWhatsAppContact }, ref) => {
           style={{ objectFit: 'cover', display: 'block', pointerEvents: 'none', zIndex: 0 }}
           tabIndex="-1"
         >
-          <source src="/bg3.mp4" type="video/mp4" />
+          <source src="/bg.mp4" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
       </div>
