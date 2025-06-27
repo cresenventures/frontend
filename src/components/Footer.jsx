@@ -2,19 +2,22 @@ import React from 'react';
 
 const Footer = () => {
   return (
-    <footer style={{ backgroundColor: '#1a1a1a', color: '#fff', padding: '40px 20px', fontFamily: 'sans-serif' }}>
+    <footer style={{ backgroundColor: '#1a1a1a', color: '#fff', padding: '32px 10px', fontFamily: 'sans-serif' }}>
       {/* Responsive style for contact info */}
       <style>{`
         @media (max-width: 600px) {
-          .footer-contact { text-align: center !important; margin-top: 20px !important; }
+          .footer-contact { text-align: center !important; margin-top: 16px !important; }
+          .footer-main { padding: 0 !important; }
+          .footer-section { margin-bottom: 12px !important; }
         }
         @media (max-width: 900px) {
           .footer-main { flex-direction: column !important; align-items: stretch !important; text-align: center !important; }
-          .footer-section { width: 100% !important; margin-bottom: 24px !important; text-align: center !important; }
+          .footer-section { width: 100% !important; margin-bottom: 16px !important; text-align: center !important; }
+          .footer-section:last-child { margin-bottom: 0 !important; }
           .footer-contact { text-align: center !important; margin-top: 0 !important; }
         }
       `}</style>
-      <div className="footer-main" style={{ maxWidth: '1200px', margin: 'auto', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '20px' }}>
+      <div className="footer-main" style={{ maxWidth: '1200px', margin: 'auto', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '12px', padding: 0 }}>
         {/* Quick Links (Left) */}
         <nav aria-label="Footer navigation" className="footer-section" style={{ flex: '1 1 250px', textAlign: 'left' }}>
           <h2 style={{ fontSize: '1.2rem', marginBottom: '8px' }}>Quick Links</h2>
