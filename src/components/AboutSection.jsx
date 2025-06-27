@@ -65,14 +65,7 @@ const AboutSection = () => {
 		<section
 			id="about"
 			aria-labelledby="about-heading"
-			className="relative py-28 bg-gradient-to-b from-secondary/80 to-white/90 overflow-hidden"
-			style={{
-				backgroundImage: "linear-gradient(rgba(255,255,255,0.92), rgba(255,255,255,0.96)), url('/paperroll.jpg')",
-				backgroundAttachment: 'fixed', // Parallax effect
-				backgroundPosition: 'center',
-				backgroundRepeat: 'no-repeat',
-				backgroundSize: 'cover',
-			}}
+			className="relative py-28 bg-white overflow-hidden"
 		>
 			<div className="absolute inset-0 z-0" aria-hidden="true" />
 			<div className="container mx-auto px-6 relative z-10">
