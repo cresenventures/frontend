@@ -3,6 +3,19 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { CreditCard, Loader2 } from 'lucide-react';
 
+// Utility to load Razorpay script
+function loadRazorpayScript() {
+  return new Promise((resolve) => {
+    if (document.getElementById('razorpay-script')) return resolve(true);
+    const script = document.createElement('script');
+    script.id = 'razorpay-script';
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+}
+
 function OrderSummaryPage() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -10,6 +23,7 @@ function OrderSummaryPage() {
   const [loading, setLoading] = React.useState(true);
   const [orderData, setOrderData] = React.useState(null);
   const [error, setError] = React.useState(null);
+  const [razorpayKey, setRazorpayKey] = React.useState(null);
 
   React.useEffect(() => {
     // If order data is passed via navigation state, use it directly
@@ -47,6 +61,24 @@ function OrderSummaryPage() {
     fetchOrder();
   }, [location.state]);
 
+  // Fetch Razorpay key from backend on mount
+  React.useEffect(() => {
+    async function fetchKey() {
+      try {
+        const res = await fetch('/api/get-razorpay-key');
+        const data = await res.json();
+        if (data.success && data.key) {
+          setRazorpayKey(data.key);
+        } else {
+          setRazorpayKey(null);
+        }
+      } catch {
+        setRazorpayKey(null);
+      }
+    }
+    fetchKey();
+  }, []);
+
   const handleProceedToPayment = async () => {
     setIsProcessing(true);
     let user = null;
@@ -59,25 +91,95 @@ function OrderSummaryPage() {
       setIsProcessing(false);
       return;
     }
+    if (!razorpayKey) {
+      setError('Payment system not ready. Please try again later.');
+      setIsProcessing(false);
+      return;
+    }
+    // Load Razorpay script
+    const scriptLoaded = await loadRazorpayScript();
+    if (!scriptLoaded) {
+      setError('Failed to load Razorpay.');
+      setIsProcessing(false);
+      return;
+    }
+    // Calculate grandTotal before using it
+    const shippingDetails = orderData?.shippingAddress || {};
+    const cart = orderData?.items || [];
+    const calculatedShippingFee = orderData?.shippingFee || 0;
+    const subtotal = orderData?.subtotal || cart.reduce((sum, item) => sum + (item.numericPrice * item.quantity), 0);
+    const grandTotal = (subtotal || 0) + (calculatedShippingFee || 0);
+    // 1. Create order on backend to get order_id
+    let orderId;
     try {
-      const res = await fetch('/api/confirm-order', {
+      console.log('[Razorpay] Creating order:', { amount: Math.round(grandTotal * 100), currency: 'INR' });
+      const res = await fetch('/api/create-razorpay-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ amount: Math.round(grandTotal * 100), currency: 'INR' })
       });
       const data = await res.json();
-      if (!data.success) {
-        setError(data.message || 'Failed to confirm order.');
-        setIsProcessing(false);
-        return;
-      }
-      // Clear cart in localStorage after successful order
-      localStorage.setItem('cresen_cart', JSON.stringify([]));
-      navigate('/orders', { replace: true });
+      console.log('[Razorpay] Backend response:', data);
+      if (!data.success || !data.order) throw new Error('Failed to create Razorpay order: ' + (data.error || 'No order object'));
+      orderId = data.order.id;
     } catch (err) {
-      setError('Failed to confirm order.');
+      setError('Failed to create payment order. ' + (err.message || ''));
+      setIsProcessing(false);
+      return;
     }
-    setIsProcessing(false);
+    // 2. Open Razorpay modal with order_id
+    const name = orderData?.name || shippingDetails?.name || '-';
+    const phone = orderData?.phone || shippingDetails?.phone || '-';
+    const address = shippingDetails?.address || '-';
+    const city = shippingDetails?.city || '-';
+    const pincode = shippingDetails?.pincode || '-';
+    const options = {
+      key: razorpayKey, // Use fetched key
+      amount: Math.round(grandTotal * 100), // in paise
+      currency: 'INR',
+      name: 'Cresen Ventures',
+      description: 'Order Payment',
+      order_id: orderId,
+      handler: async function (response) {
+        // On payment success, call backend to save order
+        try {
+          const res = await fetch('/api/confirm-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, paymentId: response.razorpay_payment_id })
+          });
+          const data = await res.json();
+          if (!data.success) {
+            setError(data.message || 'Failed to confirm order.');
+            setIsProcessing(false);
+            return;
+          }
+          localStorage.setItem('cresen_cart', JSON.stringify([]));
+          navigate('/orders', { replace: true });
+        } catch (err) {
+          setError('Failed to confirm order.');
+        }
+        setIsProcessing(false);
+      },
+      prefill: {
+        name: name,
+        email: email,
+        contact: phone,
+      },
+      notes: {
+        address: address + ', ' + city + ' - ' + pincode,
+      },
+      theme: {
+        color: '#2563eb',
+      },
+    };
+    const rzp = new window.Razorpay(options);
+    rzp.on('payment.failed', function (response) {
+      setError('Payment failed. Please try again.');
+      setIsProcessing(false);
+      console.error('[Razorpay] Payment failed:', response);
+    });
+    rzp.open();
   };
 
   if (loading) {
