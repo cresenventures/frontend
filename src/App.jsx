@@ -19,6 +19,7 @@ import { AnimatePresence } from 'framer-motion';
 import { Routes, Route } from 'react-router-dom';
 import OrderSummaryPage from './pages/OrdersummaryPage';
 import AdminPage from './pages/AdminPage';
+import OrdersPage from './pages/OrdersPage';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -247,6 +248,7 @@ function App() {
               }
             />
             <Route path="/ordersummary" element={<OrderSummaryPage />} />
+            <Route path="/orders" element={<OrdersPage />} />
             <Route path="/admin" element={<AdminPage />} />
           </Routes>
           <CartSheet

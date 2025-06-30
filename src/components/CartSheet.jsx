@@ -45,6 +45,7 @@ const CartSheet = ({ isOpen, setIsOpen, cart, updateQuantity, removeFromCart, cl
   const [isProcessing, setIsProcessing] = useState(false);
   const [showShippingFullScreen, setShowShippingFullScreen] = useState(false);
   const [googleUser, setGoogleUser] = useState(null);
+  const [orderPlaced, setOrderPlaced] = useState(false);
 
   const [shippingDetails, setShippingDetails] = useState({ name: '', phone: '', address: '', city: '', pincode: '' });
   const [calculatedShippingFee, setCalculatedShippingFee] = useState(null);
@@ -58,6 +59,21 @@ const CartSheet = ({ isOpen, setIsOpen, cart, updateQuantity, removeFromCart, cl
   const isRazorpayConfigured = RAZORPAY_KEY_ID && RAZORPAY_KEY_ID.startsWith('rzp_');
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Restore user from localStorage on mount
+  useEffect(() => {
+    const storedUser = localStorage.getItem('cresen_user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, [setUser]);
+
+  // Save user to localStorage when user logs in
+  useEffect(() => {
+    if (user && user.email) {
+      localStorage.setItem('cresen_user', JSON.stringify(user));
+    }
+  }, [user]);
 
   // Handle edit shipping from summary page
   useEffect(() => {
@@ -179,64 +195,11 @@ const CartSheet = ({ isOpen, setIsOpen, cart, updateQuantity, removeFromCart, cl
     return true;
   };
 
-  const handleProceedToPayment = async () => {
+  // --- Fix 1: Add debug log to confirm button click ---
+  const handleProceedToPayment = () => {
     if (!validateShippingForm()) return;
-
-    // Save shipping address to backend
-    try {
-      await fetch('/api/save-shipping', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: user?.email,
-          shipping: shippingDetails
-        })
-      });
-    } catch (err) {
-      toast({ variant: 'destructive', title: 'Shipping Save Failed', description: 'Could not save shipping address.' });
-    }
-    
-    setIsProcessing(true);
-
-    const res = await loadScript('https://checkout.razorpay.com/v1/checkout.js');
-    if (!res) {
-      toast({ variant: 'destructive', title: 'Payment Gateway Error', description: 'Could not load payment gateway. Please try again.' });
-      setIsProcessing(false);
-      return;
-    }
-
-    const options = {
-      key: RAZORPAY_KEY_ID,
-      amount: grandTotal * 100, // amount in the smallest currency unit
-      currency: "INR",
-      name: "Cresen Ventures",
-      description: "Thermal Paper Rolls Order",
-      image: "/logo.svg", // You can add a logo URL here
-      handler: function (response) {
-        toast({ title: '✅ Payment Successful!', description: `Payment ID: ${response.razorpay_payment_id}` });
-        clearCart();
-        setIsCheckoutOpen(false);
-      },
-      prefill: {
-        name: shippingDetails.name,
-        email: email,
-        contact: shippingDetails.phone,
-      },
-      notes: {
-        address: `${shippingDetails.address}, ${shippingDetails.city}, ${shippingDetails.pincode}`,
-        cart: JSON.stringify(cart),
-      },
-      theme: {
-        color: "#408BF2",
-      },
-    };
-
-    const paymentObject = new window.Razorpay(options);
-    paymentObject.on('payment.failed', function (response) {
-        toast({ variant: 'destructive', title: 'Payment Failed', description: response.error.description });
-        setIsProcessing(false);
-    });
-    paymentObject.open();
+    navigate('/order-confirmation', { replace: true });
+    clearCart();
   };
 
   const CartItem = ({ item }) => {
@@ -346,25 +309,70 @@ const CartSheet = ({ isOpen, setIsOpen, cart, updateQuantity, removeFromCart, cl
               className="w-full mt-2"
               onClick={async () => {
                 if (!validateShippingForm()) return;
-                // Calculate shipping based on pincode
+                // Calculate shipping based on product type
                 let shippingFee = 0;
-                const totalBoxes = cart.reduce((sum, item) => sum + item.quantity, 0);
-                if (shippingDetails.pincode.startsWith('67') || shippingDetails.pincode.startsWith('68')) {
-                  shippingFee = 350 * totalBoxes;
-                } else {
-                  shippingFee = 600 * totalBoxes;
-                }
+                cart.forEach(item => {
+                  if (
+                    item.title === 'Standard Roll Box' ||
+                    (item.title && item.title.toLowerCase().includes('standard'))
+                  ) {
+                    shippingFee += 1350 * item.quantity;
+                  } else if (
+                    item.title === 'Compact Roll Box' ||
+                    (item.title && item.title.toLowerCase().includes('compact'))
+                  ) {
+                    shippingFee += 1200 * item.quantity;
+                  }
+                });
                 setCalculatedShippingFee(shippingFee);
-                setShowSummary(true);
+                // Save attempted order to backend
+                try {
+                  const email = user?.email || googleUser?.email || '';
+                  if (!email) {
+                    toast({ variant: 'destructive', title: 'Not logged in', description: 'Please log in before saving your shipping details.' });
+                    return;
+                  }
+                  try {
+                    const response = await fetch('/api/save-attempted-order', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        name: shippingDetails.name,
+                        email,
+                        phone: shippingDetails.phone,
+                        items: cart,
+                        shippingAddress: { ...shippingDetails },
+                        shippingFee
+                      })
+                    });
+                    const result = await response.json();
+                    if (!result.success) {
+                      toast({ variant: 'destructive', title: 'Order Save Failed', description: result.error || 'Could not save attempted order.' });
+                      return;
+                    }
+                  } catch (err) {
+                    toast({ variant: 'destructive', title: 'Order Save Failed', description: 'Could not save attempted order.' });
+                    console.error('Order save error:', err);
+                    return;
+                  }
+                } catch (err) {
+                  toast({ variant: 'destructive', title: 'Order Save Failed', description: 'Could not save attempted order.' });
+                }
                 toast({ title: 'Shipping Fee Calculated', description: `Shipping Fee: ₹${shippingFee}` });
-                // Redirect to order summary page
+                // Debug: log shipping details before navigating
+                console.log('Navigating to summary with shippingDetails:', shippingDetails);
+                // Instead of reload, navigate to summary page (no full reload)
                 navigate('/ordersummary', {
                   state: {
-                    cart,
-                    shippingDetails,
-                    calculatedShippingFee: shippingFee,
-                    subtotal
-                  }
+                    order: {
+                      name: shippingDetails.name,
+                      phone: shippingDetails.phone,
+                      shippingAddress: { ...shippingDetails },
+                      items: cart,
+                      shippingFee
+                    }
+                  },
+                  replace: true
                 });
                 setShowShippingFullScreen(false); // Hide shipping form after navigation
                 setIsCheckoutOpen(false); // Close checkout dialog
@@ -372,7 +380,62 @@ const CartSheet = ({ isOpen, setIsOpen, cart, updateQuantity, removeFromCart, cl
             >
               Save & Calculate Shipping
             </Button>
-            {/* Remove summary and payment button from this dialog */}
+          </div>
+        </div>
+      )}
+
+      {/* Order Summary Screen */}
+      {showSummary && (
+        <div className="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center p-8">
+          <div className="w-full max-w-lg mx-auto">
+            <h2 className="text-2xl font-bold mb-4">Order Summary</h2>
+            <div className="mb-4 flex-1">
+              <h3 className="font-semibold mb-2 flex items-center">Shipping Details
+                <Button
+                  variant="link"
+                  className="ml-2 p-0 h-auto text-blue-600 text-xs"
+                  style={{ textDecoration: 'underline', fontWeight: 400 }}
+                  onClick={() => {
+                    setShowSummary(false);
+                    setShowShippingFullScreen(true);
+                    setIsCheckoutOpen(true);
+                    setCheckoutStep('address');
+                  }}
+                >Edit</Button>
+              </h3>
+              <div className="text-sm text-gray-700">
+                <div><b>Name:</b> {shippingDetails.name}</div>
+                <div><b>Phone:</b> {shippingDetails.phone}</div>
+                <div><b>Address:</b> {shippingDetails.address}, {shippingDetails.city} - {shippingDetails.pincode}</div>
+              </div>
+            </div>
+            <div className="mb-4">
+              <h3 className="font-semibold mb-2">Items</h3>
+              {cart.map(item => (
+                <div key={item.title} className="flex justify-between">
+                  <span>{item.title} x {item.quantity}</span>
+                  <span>₹{(item.numericPrice * item.quantity).toFixed(2)}</span>
+                </div>
+              ))}
+            </div>
+            <div className="mb-2 flex justify-between"><span>Subtotal</span><span>₹{subtotal.toFixed(2)}</span></div>
+            <div className="mb-2 flex justify-between"><span>Shipping</span><span>₹{calculatedShippingFee?.toFixed(2)}</span></div>
+            <div className="mb-4 flex justify-between font-bold text-lg"><span>Grand Total</span><span>₹{(subtotal + (calculatedShippingFee || 0)).toFixed(2)}</span></div>
+            {/* Proceed to Payment button removed as requested */}
+          </div>
+        </div>
+      )}
+
+      {orderPlaced && (
+        <div className="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center p-8">
+          <div className="flex flex-col items-center">
+            <svg width="100" height="100" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="45" fill="#e6ffe6" stroke="#4ade80" strokeWidth="5" />
+              <polyline points="30,55 45,70 70,40" fill="none" stroke="#22c55e" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            <h2 className="text-2xl font-bold mt-6 mb-2 text-green-600">Order Placed!</h2>
+            <p className="text-gray-700 mb-4">Thank you for your purchase. Your order has been placed successfully.</p>
+            <Button className="mt-2" onClick={() => setOrderPlaced(false)}>Close</Button>
           </div>
         </div>
       )}

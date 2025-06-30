@@ -48,7 +48,7 @@ const HeroSection = React.forwardRef(({ handleWhatsAppContact }, ref) => {
           loop
           muted
           playsInline
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover hero-image"
           style={{ objectFit: 'cover', display: 'block', pointerEvents: 'none', zIndex: 0 }}
           tabIndex="-1"
         >
@@ -60,7 +60,7 @@ const HeroSection = React.forwardRef(({ handleWhatsAppContact }, ref) => {
         <h1
           id="hero-heading"
           ref={titleRef}
-          className="text-5xl xs:text-6xl md:text-7xl font-extrabold text-white mb-6 leading-tight drop-shadow-xl"
+          className="text-5xl xs:text-6xl md:text-7xl font-extrabold text-white mb-6 leading-tight drop-shadow-xl hero-title"
         >
           Premium Thermal Paper Solutions
           <span className="block w-full text-3xl xs:text-4xl md:text-4xl font-bold mt-2">
@@ -70,13 +70,13 @@ const HeroSection = React.forwardRef(({ handleWhatsAppContact }, ref) => {
         </h1>
         <p
           ref={subtitleRef}
-          className="text-base xs:text-lg md:text-2xl text-white font-medium mb-10 max-w-2xl mx-auto drop-shadow"
+          className="text-base xs:text-lg md:text-2xl text-white font-medium mb-10 max-w-2xl mx-auto drop-shadow hero-subtitle"
         >
           Globally recognized manufacturer delivering clear, durable, reliable thermal paper products for diverse industries.
         </p>
         <div
           ref={buttonsRef}
-          className="flex flex-col gap-4 sm:flex-row sm:gap-5 justify-center items-center w-full"
+          className="flex flex-col gap-4 sm:flex-row sm:gap-5 justify-center items-center w-full hero-buttons"
         >
           <Button
             onClick={() => document.getElementById('products').scrollIntoView({ behavior: 'smooth' })}

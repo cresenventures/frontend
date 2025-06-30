@@ -133,7 +133,7 @@ const ProductsSection = ({ addToCart, handleWhatsAppContact }) => {
         </h1>
       </div>
       
-      <div className="container mx-auto px-6 relative z-10">
+      <div className="container mx-auto px-6 relative z-10 overflow-hidden">
         <div className="text-center mb-16 animate-on-scroll">
           <h2 className="text-5xl md:text-6xl font-extrabold text-white mb-4 tracking-tighter">
             Choose Your Perfect Roll

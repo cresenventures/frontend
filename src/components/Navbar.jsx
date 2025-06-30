@@ -2,12 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Phone, Menu, X } from 'lucide-react';
-import { GoogleLogin } from '@react-oauth/google';
+import { GoogleLogin, googleLogout } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const Navbar = ({ handleCallNow, user, setUser, setCart }) => {
   const [scrolled, setScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Dropdown close timer ref
+  const dropdownTimer = React.useRef();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -42,12 +49,45 @@ const Navbar = ({ handleCallNow, user, setUser, setCart }) => {
     } catch (err) {}
   };
 
+  const handleLogoClick = (e) => {
+    e.preventDefault();
+    if (location.pathname !== '/') {
+      navigate('/');
+      // Wait for navigation, then scroll
+      setTimeout(() => {
+        const hero = document.getElementById('hero-heading');
+        if (hero) hero.scrollIntoView({ behavior: 'smooth' });
+      }, 300);
+    } else {
+      const hero = document.getElementById('hero-heading');
+      if (hero) hero.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  // Helper to handle nav link clicks
+  const handleNavLinkClick = (e, href) => {
+    e.preventDefault();
+    const sectionId = href.replace('#', '');
+    if (location.pathname !== '/') {
+      navigate('/');
+      setTimeout(() => {
+        const el = document.getElementById(sectionId);
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      }, 350);
+    } else {
+      const el = document.getElementById(sectionId);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+    setIsOpen(false);
+  };
+
   return (
     <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled || isOpen ? 'bg-white/90 backdrop-blur-lg border-b border-gray-200' : 'bg-gradient-to-b from-black/70 via-black/40 to-transparent'}`}>
       <div className="container mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           <motion.a 
             href="#"
+            onClick={handleLogoClick}
             className="flex items-center space-x-3"
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -80,11 +120,20 @@ const Navbar = ({ handleCallNow, user, setUser, setCart }) => {
               <motion.a
                 key={link.name} 
                 href={link.href} 
+                onClick={e => handleNavLinkClick(e, link.href)}
                 className={`transition-colors ${scrolled || isOpen ? 'text-gray-700 hover:text-primary' : 'text-white hover:text-primary/90'}`}
               >
                 {link.name}
               </motion.a>
             ))}
+            {user && user.email && (
+              <Button
+                onClick={() => navigate('/orders')}
+                className={`px-6 py-2 rounded-full transition-all duration-300 transform hover:scale-105 bg-primary text-primary-foreground`}
+              >
+                Orders
+              </Button>
+            )}
             <Button 
               onClick={handleCallNow}
               className={`px-6 py-2 rounded-full transition-all duration-300 transform hover:scale-105
@@ -98,7 +147,43 @@ const Navbar = ({ handleCallNow, user, setUser, setCart }) => {
               Call Now
             </Button>
             {user && user.email ? (
-              <span className="text-sm font-semibold text-primary ml-4">{user.name || user.email}</span>
+              <div
+                className="relative ml-4"
+                onMouseEnter={() => {
+                  if (dropdownTimer.current) clearTimeout(dropdownTimer.current);
+                  setShowDropdown(true);
+                }}
+                onMouseLeave={() => {
+                  dropdownTimer.current = setTimeout(() => setShowDropdown(false), 300);
+                }}
+              >
+                <span
+                  className="text-sm font-semibold text-primary cursor-pointer flex items-center gap-1"
+                  onClick={() => setShowDropdown((v) => !v)}
+                >
+                  {user.name || user.email}
+                  <svg className={`w-4 h-4 inline-block transition-transform ${showDropdown ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
+                </span>
+                {showDropdown && (
+                  <div
+                    className="absolute right-0 mt-2 w-36 bg-white border border-gray-200 rounded shadow-lg z-50"
+                    onMouseEnter={() => {
+                      if (dropdownTimer.current) clearTimeout(dropdownTimer.current);
+                      setShowDropdown(true);
+                    }}
+                    onMouseLeave={() => {
+                      dropdownTimer.current = setTimeout(() => setShowDropdown(false), 300);
+                    }}
+                  >
+                    <button
+                      onClick={() => { googleLogout(); setUser(null); setShowDropdown(false); }}
+                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
               <div className="ml-4"><GoogleLogin
                 onSuccess={handleGoogleLoginSuccess}
@@ -127,12 +212,20 @@ const Navbar = ({ handleCallNow, user, setUser, setCart }) => {
               <a 
                 key={link.name} 
                 href={link.href} 
-                onClick={() => setIsOpen(false)} 
+                onClick={e => handleNavLinkClick(e, link.href)}
                 className={`transition-colors ${scrolled || isOpen ? 'text-gray-700 hover:text-primary' : 'text-white hover:text-primary/90'}`}
               >
                 {link.name}
               </a>
             ))}
+            {user && user.email && (
+              <Button
+                onClick={() => { navigate('/orders'); setIsOpen(false); }}
+                className={`px-6 py-2 rounded-full transition-all duration-300 w-full bg-primary text-primary-foreground`}
+              >
+                Orders
+              </Button>
+            )}
             <Button 
               onClick={() => { handleCallNow(); setIsOpen(false); }}
               className={`px-6 py-2 rounded-full transition-all duration-300 w-full
@@ -146,7 +239,15 @@ const Navbar = ({ handleCallNow, user, setUser, setCart }) => {
               Call Now
             </Button>
             {user && user.email ? (
-              <span className="text-sm font-semibold text-primary mt-2">{user.name || user.email}</span>
+              <div className="flex flex-col items-center mt-2 w-full">
+                <span className="text-sm font-semibold text-primary mb-2">{user.name || user.email}</span>
+                <Button
+                  onClick={() => { googleLogout(); setUser(null); setIsOpen(false); }}
+                  className="w-full bg-red-500 text-white rounded-full px-4 py-2 mt-1"
+                >
+                  Logout
+                </Button>
+              </div>
             ) : (
               <div className="mt-2"><GoogleLogin
                 onSuccess={handleGoogleLoginSuccess}
