@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { GoogleLogin, googleLogout } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
+import { BACKEND_URL } from '@/lib/config';
 
 const ALLOWED_EMAILS = [
   'cresenventures@gmail.com',
@@ -32,7 +33,7 @@ function AdminPage() {
       const decoded = jwtDecode(credentialResponse.credential);
       const email = (decoded.email || '').trim().toLowerCase();
       // Check role from backend
-      const res = await fetch('/api/google-login', {
+      const res = await fetch(`${BACKEND_URL}/api/google-login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
@@ -70,7 +71,7 @@ function AdminPage() {
       // Only allow valid tab values
       const validTabs = ["attempted", "new", "dispatched"];
       const safeTab = validTabs.includes(activeTab) ? activeTab : "attempted";
-      fetch(`/api/admin-orders?tab=${safeTab}`)
+      fetch(`${BACKEND_URL}/api/admin-orders?tab=${safeTab}`)
         .then(async (res) => {
           if (!res.ok) {
             const errorText = await res.text();
@@ -99,7 +100,7 @@ function AdminPage() {
       const tabs = ["attempted", "new", "dispatched"];
       const results = await Promise.all(
         tabs.map(tab =>
-          fetch(`/api/admin-orders?tab=${tab}`)
+          fetch(`${BACKEND_URL}/api/admin-orders?tab=${tab}`)
             .then(res => res.json())
             .then(data => data.success && data.orders ? data.orders : [])
         )
@@ -119,7 +120,7 @@ function AdminPage() {
     setLoading(true);
     setError("");
     try {
-      const url = `/api/admin-update-shipping`;
+      const url = `${BACKEND_URL}/api/admin-update-shipping`;
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -162,7 +163,7 @@ function AdminPage() {
     setLoading(true);
     setError("");
     try {
-      const url = `/api/admin-update-shipping`;
+      const url = `${BACKEND_URL}/api/admin-update-shipping`;
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

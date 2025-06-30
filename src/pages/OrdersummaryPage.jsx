@@ -2,6 +2,7 @@ import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { CreditCard, Loader2 } from 'lucide-react';
+import { BACKEND_URL } from '@/lib/config';
 
 // Utility to load Razorpay script
 function loadRazorpayScript() {
@@ -47,7 +48,7 @@ function OrderSummaryPage() {
           setLoading(false);
           return;
         }
-        const res = await fetch(`/api/get-latest-attempted-order?email=${encodeURIComponent(email)}`);
+        const res = await fetch(`${BACKEND_URL}/api/get-latest-attempted-order?email=${encodeURIComponent(email)}`);
         if (!res.ok) throw new Error('Failed to fetch order');
         const data = await res.json();
         if (!data.success || !data.order) throw new Error('No attempted order found');
@@ -65,7 +66,7 @@ function OrderSummaryPage() {
   React.useEffect(() => {
     async function fetchKey() {
       try {
-        const res = await fetch('/api/get-razorpay-key');
+        const res = await fetch(`${BACKEND_URL}/api/get-razorpay-key`);
         const data = await res.json();
         if (data.success && data.key) {
           setRazorpayKey(data.key);
@@ -113,7 +114,7 @@ function OrderSummaryPage() {
     let orderId;
     try {
       console.log('[Razorpay] Creating order:', { amount: Math.round(grandTotal * 100), currency: 'INR' });
-      const res = await fetch('/api/create-razorpay-order', {
+      const res = await fetch(`${BACKEND_URL}/api/create-razorpay-order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ amount: Math.round(grandTotal * 100), currency: 'INR' })
@@ -143,7 +144,7 @@ function OrderSummaryPage() {
       handler: async function (response) {
         // On payment success, call backend to save order
         try {
-          const res = await fetch('/api/confirm-order', {
+          const res = await fetch(`${BACKEND_URL}/api/confirm-order`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, paymentId: response.razorpay_payment_id })

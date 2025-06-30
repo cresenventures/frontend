@@ -5,6 +5,7 @@ import { Phone, Menu, X } from 'lucide-react';
 import { GoogleLogin, googleLogout } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { BACKEND_URL } from '@/lib/config';
 
 const Navbar = ({ handleCallNow, user, setUser, setCart }) => {
   const [scrolled, setScrolled] = useState(false);
@@ -37,7 +38,7 @@ const Navbar = ({ handleCallNow, user, setUser, setCart }) => {
     setUser(decoded);
     // Fetch cart from backend and restore
     try {
-      const cartRes = await fetch('/api/get-cart', {
+      const cartRes = await fetch(`${BACKEND_URL}/api/get-cart`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: decoded.email })

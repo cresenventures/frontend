@@ -23,6 +23,7 @@ import { useToast } from './ui/use-toast';
 import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { BACKEND_URL } from '@/lib/config';
 
 const RAZORPAY_KEY_ID = 'rzp_test_njYQGaQX85zmZf';
 
@@ -149,7 +150,7 @@ const CartSheet = ({ isOpen, setIsOpen, cart, updateQuantity, removeFromCart, cl
     }));
     // Call backend to create/update user with role 'customer'
     try {
-      const response = await fetch('/api/google-login', {
+      const response = await fetch(`${BACKEND_URL}/api/google-login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: decoded.email })
@@ -161,7 +162,7 @@ const CartSheet = ({ isOpen, setIsOpen, cart, updateQuantity, removeFromCart, cl
         setUser(user => ({ ...user, ...data.user }));
       }
       // Fetch cart from backend and merge/replace local cart
-      const cartRes = await fetch('/api/get-cart', {
+      const cartRes = await fetch(`${BACKEND_URL}/api/get-cart`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: decoded.email })
@@ -333,7 +334,7 @@ const CartSheet = ({ isOpen, setIsOpen, cart, updateQuantity, removeFromCart, cl
                     return;
                   }
                   try {
-                    const response = await fetch('/api/save-attempted-order', {
+                    const response = await fetch(`${BACKEND_URL}/api/save-attempted-order`, {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({

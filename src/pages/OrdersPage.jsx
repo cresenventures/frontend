@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { BACKEND_URL } from '@/lib/config';
 
 const OrdersPage = () => {
   const [orders, setOrders] = useState([]);
@@ -21,7 +22,7 @@ const OrdersPage = () => {
         return;
       }
       try {
-        const res = await fetch(`/api/get-orders?email=${encodeURIComponent(email)}`, {
+        const res = await fetch(`${BACKEND_URL}/api/get-orders?email=${encodeURIComponent(email)}`, {
           method: 'GET',
           credentials: 'include', // assumes session or JWT cookie
         });
