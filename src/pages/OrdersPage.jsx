@@ -41,7 +41,7 @@ const OrdersPage = () => {
   }, []);
 
   return (
-    <div className="orders-page-container pt-20">
+    <div className="orders-page-container pt-24 sm:pt-20">
       <h2 className="orders-title">My Orders</h2>
       {loading && <p>Loading orders...</p>}
       {error && <p className="orders-error">{error}</p>}
@@ -84,7 +84,7 @@ const OrdersPage = () => {
           padding: 2rem 1rem;
           max-width: 900px;
           margin: 0 auto;
-          padding-top: 4.5rem;
+          padding-top: 6.5rem;
         }
         .orders-title {
           font-size: 2.2rem;
@@ -180,6 +180,7 @@ const OrdersPage = () => {
         @media (max-width: 600px) {
           .orders-page-container {
             padding: 1rem 0.2rem;
+            padding-top: 5.5rem;
           }
           .orders-title {
             font-size: 1.4rem;
