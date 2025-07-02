@@ -210,6 +210,14 @@ function App() {
 
   const clearCart = () => {
     setCart([]);
+    if (user && user.email) {
+      // Clear backend cart as well
+      fetch(`${BACKEND_URL}/api/save-cart`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: user.email, cart: [] })
+      });
+    }
   }
 
   const totalCartItems = cart.reduce((sum, item) => sum + item.quantity, 0);
