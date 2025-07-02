@@ -20,6 +20,7 @@ import { Routes, Route } from 'react-router-dom';
 import OrderSummaryPage from './pages/OrdersummaryPage';
 import AdminPage from './pages/AdminPage';
 import OrdersPage from './pages/OrdersPage';
+import { BACKEND_URL } from './lib/config';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -133,7 +134,7 @@ function App() {
 
   useEffect(() => {
     if (user && user.email) {
-      fetch('/api/save-cart', {
+      fetch(`${BACKEND_URL}/api/save-cart`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: user.email, cart })
