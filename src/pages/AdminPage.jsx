@@ -242,7 +242,6 @@ function AdminPage() {
         ) : error ? (
           <div className="text-red-500">{error}</div>
         ) : orders[activeTab] && orders[activeTab].length > 0 ? (
-          <div className="overflow-x-auto">
             <table className="min-w-full bg-white border border-gray-200 rounded-lg">
               <thead>
                 <tr className="bg-blue-50">
@@ -251,6 +250,7 @@ function AdminPage() {
                   <th className="px-3 py-2 border-b text-left">Email</th>
                   <th className="px-3 py-2 border-b text-left">Phone</th>
                   <th className="px-3 py-2 border-b text-left">Address</th>
+                  <th className="px-3 py-2 border-b text-left">Items</th>
                   <th className="px-3 py-2 border-b text-left">Status</th>
                   <th className="px-3 py-2 border-b text-left">Total</th>
                   <th className="px-3 py-2 border-b text-left">Date</th>
@@ -277,6 +277,13 @@ function AdminPage() {
                     <td className="px-3 py-2 border-b">{order.email || '-'}</td>
                     <td className="px-3 py-2 border-b">{order.phone || '-'}</td>
                     <td className="px-3 py-2 border-b">{order.shippingAddress ? `${order.shippingAddress.address || ''}, ${order.shippingAddress.city || ''} - ${order.shippingAddress.pincode || ''}` : '-'}</td>
+                    <td className="px-3 py-2 border-b">{order.items && order.items.length > 0 ? (
+                      <ul className="list-disc pl-4">
+                        {order.items.map((item, idx) => (
+                          <li key={idx}>{item.title} x {item.quantity}</li>
+                        ))}
+                      </ul>
+                    ) : '-'}</td>
                     <td className="px-3 py-2 border-b">{order.status || '-'}</td>
                     <td className="px-3 py-2 border-b">₹{order.items ? order.items.reduce((sum, item) => sum + (item.numericPrice * item.quantity), 0) + (order.shippingFee || 0) : '-'}</td>
                     <td className="px-3 py-2 border-b">{order.createdAt ? new Date(order.createdAt).toLocaleString() : '-'}</td>
@@ -332,7 +339,6 @@ function AdminPage() {
                 ))}
               </tbody>
             </table>
-          </div>
         ) : (
           <div className="text-gray-500">No orders found for <b>{TABS.find(t => t.key === activeTab).label}</b>.</div>
         )}
