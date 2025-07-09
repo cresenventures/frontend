@@ -250,6 +250,7 @@ function AdminPage() {
                   <th className="px-3 py-2 border-b text-left">Name</th>
                   <th className="px-3 py-2 border-b text-left">Email</th>
                   <th className="px-3 py-2 border-b text-left">Phone</th>
+                  <th className="px-3 py-2 border-b text-left">Address</th>
                   <th className="px-3 py-2 border-b text-left">Status</th>
                   <th className="px-3 py-2 border-b text-left">Total</th>
                   <th className="px-3 py-2 border-b text-left">Date</th>
@@ -275,6 +276,7 @@ function AdminPage() {
                     <td className="px-3 py-2 border-b">{order.name || '-'}</td>
                     <td className="px-3 py-2 border-b">{order.email || '-'}</td>
                     <td className="px-3 py-2 border-b">{order.phone || '-'}</td>
+                    <td className="px-3 py-2 border-b">{order.shippingAddress ? `${order.shippingAddress.address || ''}, ${order.shippingAddress.city || ''} - ${order.shippingAddress.pincode || ''}` : '-'}</td>
                     <td className="px-3 py-2 border-b">{order.status || '-'}</td>
                     <td className="px-3 py-2 border-b">₹{order.items ? order.items.reduce((sum, item) => sum + (item.numericPrice * item.quantity), 0) + (order.shippingFee || 0) : '-'}</td>
                     <td className="px-3 py-2 border-b">{order.createdAt ? new Date(order.createdAt).toLocaleString() : '-'}</td>
