@@ -37,7 +37,7 @@ const ContactSection = ({ handleCallNow, handleEmailContact, handleWhatsAppConta
           </div>
           <div>
             <h2 className="text-xl font-semibold mb-2">WhatsApp</h2>
-            <a href="https://wa.me/9179949518317" className="text-primary hover:underline block mb-1" target="_blank" rel="noopener noreferrer">+91 79949 51831</a>
+            <a href="https://wa.me/919995742767" className="text-primary hover:underline block mb-1" target="_blank" rel="noopener noreferrer">+91 79949 51831</a>
             <span className="text-gray-600">Quick quotes and customization</span>
           </div>
         </div>
