@@ -31,18 +31,13 @@ const ContactSection = ({ handleCallNow, handleEmailContact, handleWhatsAppConta
         <p className="text-lg text-gray-700 mb-8">Reach out for product inquiries, quotes, or support. Our team is ready to assist you.</p>
         <div className="grid md:grid-cols-3 gap-8">
           <div>
-            <h2 className="text-xl font-semibold mb-2">Phone</h2>
-            <a href="tel:+919995742767" className="text-primary hover:underline block mb-1">+91 9995742767</a>
-            <span className="text-gray-600">Call us for immediate assistance</span>
-          </div>
-          <div>
             <h2 className="text-xl font-semibold mb-2">Email</h2>
             <a href="mailto:cresenventures@gmail.com" className="text-primary hover:underline block mb-1">cresenventures@gmail.com</a>
             <span className="text-gray-600">Send us your requirements</span>
           </div>
           <div>
             <h2 className="text-xl font-semibold mb-2">WhatsApp</h2>
-            <a href="https://wa.me/917994951831" className="text-primary hover:underline block mb-1" target="_blank" rel="noopener noreferrer">+91 79949 51831</a>
+            <a href="https://wa.me/919995742767" className="text-primary hover:underline block mb-1" target="_blank" rel="noopener noreferrer">+91 79949 51831</a>
             <span className="text-gray-600">Quick quotes and customization</span>
           </div>
         </div>

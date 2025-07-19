@@ -148,7 +148,7 @@ function App() {
 
   const handleWhatsAppContact = () => {
     const message = encodeURIComponent("Hi, I’m interested in customizing Cresen Thermal Paper for my business. Could you please share the available options and pricing details?");
-    window.open(`https://wa.me/917994951831?text=${message}`, '_blank');
+    window.open(`https://wa.me/919995742767?text=${message}`, '_blank');
   };
 
   const handleCallNow = () => {
